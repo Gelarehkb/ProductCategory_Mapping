@@ -1,11 +1,7 @@
-import { useState } from "react";
 import { FileUploader } from "@/components/FileUploader";
-import { ApiEndpointInput } from "@/components/ApiEndpointInput";
-import { FileSpreadsheet, Code2, ArrowRight } from "lucide-react";
+import { FileSpreadsheet, ArrowRight } from "lucide-react";
 
 const Index = () => {
-  const [apiEndpoint, setApiEndpoint] = useState("");
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -16,8 +12,8 @@ const Index = () => {
               <FileSpreadsheet className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">File Processor</h1>
-              <p className="text-sm text-muted-foreground">Upload, process, download</p>
+              <h1 className="text-xl font-semibold text-foreground">Category Processor</h1>
+              <p className="text-sm text-muted-foreground">Parse category hierarchies</p>
             </div>
           </div>
         </div>
@@ -29,11 +25,11 @@ const Index = () => {
           {/* Instructions */}
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-semibold text-foreground">
-              Process Your Data Files
+              Process Category Data
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Upload a CSV or Excel file, send it to your Python backend, 
-              and download the processed result.
+              Upload a CSV with category paths (separated by "→"), 
+              and download a flattened version with separate columns.
             </p>
           </div>
 
@@ -55,47 +51,32 @@ const Index = () => {
             </span>
           </div>
 
-          {/* API Endpoint Config */}
+          {/* File Uploader */}
           <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <Code2 className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">API Endpoint</span>
-            </div>
-            <ApiEndpointInput value={apiEndpoint} onChange={setApiEndpoint} />
+            <FileUploader />
           </div>
 
-          {/* File Uploader */}
-          {apiEndpoint && (
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-              <FileUploader apiEndpoint={apiEndpoint} />
-            </div>
-          )}
-
-          {/* Setup Guide */}
-          {!apiEndpoint && (
-            <div className="bg-secondary/30 rounded-xl p-6 space-y-4">
-              <h3 className="font-medium text-foreground">Quick Setup Guide</h3>
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <p>Your Python API should:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Accept POST requests with multipart/form-data</li>
-                  <li>Receive the file in a form field named "file"</li>
-                  <li>Return the processed CSV file in the response body</li>
-                </ul>
-                <div className="mt-4 p-4 bg-card rounded-lg border border-border">
-                  <p className="text-xs text-muted-foreground mb-2">Example Flask endpoint:</p>
-                  <pre className="text-xs text-foreground overflow-x-auto">
-{`@app.route('/process', methods=['POST'])
-def process_file():
-    file = request.files['file']
-    # Your processing logic here
-    processed_df = your_python_function(file)
-    return processed_df.to_csv(index=False)`}
-                  </pre>
-                </div>
+          {/* Format Guide */}
+          <div className="bg-secondary/30 rounded-xl p-6 space-y-4">
+            <h3 className="font-medium text-foreground">Expected CSV Format</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>Your CSV file should have:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Semicolon (;) as delimiter</li>
+                <li>First column: ID</li>
+                <li>Second column: Category paths separated by "-&gt;"</li>
+                <li>Multiple paths per cell allowed (one per line)</li>
+              </ul>
+              <div className="mt-4 p-4 bg-card rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground mb-2">Example input:</p>
+                <pre className="text-xs text-foreground overflow-x-auto">
+{`ID;Categories
+123;Electronics -> Phones -> Smartphones
+456;Home -> Kitchen -> Appliances`}
+                </pre>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </main>
 
@@ -103,7 +84,7 @@ def process_file():
       <footer className="border-t border-border mt-auto">
         <div className="container max-w-4xl py-4 px-4">
           <p className="text-xs text-muted-foreground text-center">
-            Files are sent directly to your Python API • Nothing is stored on our servers
+            All processing happens in your browser • No data is sent to any server
           </p>
         </div>
       </footer>
