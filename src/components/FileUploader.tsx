@@ -1,18 +1,23 @@
 import { useState, useCallback, useRef } from "react";
 import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
 
-type UploadStatus = "idle" | "uploading" | "success" | "error";
+type UploadStatus = "idle" | "processing" | "success" | "error";
 
 interface FileUploaderProps {
-  apiEndpoint: string;
+  className?: string;
 }
 
-export function FileUploader({ apiEndpoint }: FileUploaderProps) {
+export function FileUploader({ className }: FileUploaderProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [prefix, setPrefix] = useState<string>("OUTPUT");
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [outputFilename, setOutputFilename] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,32 +97,30 @@ export function FileUploader({ apiEndpoint }: FileUploaderProps) {
   const processFile = async () => {
     if (!file) return;
 
-    setStatus("uploading");
+    setStatus("processing");
     setErrorMessage("");
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const response = await fetch(apiEndpoint, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const blob = await response.blob();
+      // Read file content
+      const text = await file.text();
+      
+      // Process using TypeScript logic
+      const result = processCategories(text, prefix);
+      const filename = generateOutputFilename(prefix);
+      
+      // Create download blob
+      const blob = new Blob([result], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
+      
       setDownloadUrl(url);
+      setOutputFilename(filename);
       setStatus("success");
     } catch (error) {
       setStatus("error");
       setErrorMessage(
         error instanceof Error 
           ? error.message 
-          : "Failed to process file. Please check your API endpoint."
+          : "Failed to process file. Please check the file format."
       );
     }
   };
@@ -127,7 +130,7 @@ export function FileUploader({ apiEndpoint }: FileUploaderProps) {
 
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.download = `processed_${file?.name.replace(/\.(xlsx|xls)$/i, ".csv") || "result.csv"}`;
+    link.download = outputFilename || "result.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -140,7 +143,22 @@ export function FileUploader({ apiEndpoint }: FileUploaderProps) {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 animate-slide-up">
+    <div className={cn("w-full max-w-xl mx-auto space-y-6 animate-slide-up", className)}>
+      {/* Prefix Input */}
+      <div className="space-y-2">
+        <Label htmlFor="prefix">Output File Prefix</Label>
+        <Input
+          id="prefix"
+          value={prefix}
+          onChange={(e) => setPrefix(e.target.value)}
+          placeholder="Enter prefix for output filename"
+          className="h-11"
+        />
+        <p className="text-xs text-muted-foreground">
+          Output: {generateOutputFilename(prefix)}
+        </p>
+      </div>
+
       {/* Upload Zone */}
       <div
         onDrop={handleDrop}
@@ -214,10 +232,10 @@ export function FileUploader({ apiEndpoint }: FileUploaderProps) {
       {file && status !== "success" && (
         <Button
           onClick={processFile}
-          disabled={status === "uploading"}
+          disabled={status === "processing" || !prefix.trim()}
           className="w-full h-12 text-base"
         >
-          {status === "uploading" ? (
+          {status === "processing" ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Processing...
