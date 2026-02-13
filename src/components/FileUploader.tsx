@@ -1,10 +1,12 @@
 import { useState, useCallback, useRef } from "react";
-import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
+import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
 
@@ -20,6 +22,7 @@ export function FileUploader({ className }: FileUploaderProps) {
   const [outputFilename, setOutputFilename] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
+  const [previewData, setPreviewData] = useState<{ headers: string[]; rows: string[][] } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const acceptedTypes = [
@@ -47,13 +50,26 @@ export function FileUploader({ className }: FileUploaderProps) {
     return true;
   };
 
-  const handleFile = useCallback((selectedFile: File) => {
+  const handleFile = useCallback(async (selectedFile: File) => {
     setErrorMessage("");
     setDownloadUrl(null);
     setStatus("idle");
+    setPreviewData(null);
 
     if (validateFile(selectedFile)) {
       setFile(selectedFile);
+      // Parse preview
+      try {
+        const text = await selectedFile.text();
+        const parsed = Papa.parse<string[]>(text, { delimiter: ";", skipEmptyLines: true });
+        if (parsed.data.length > 0) {
+          const headers = parsed.data[0];
+          const rows = parsed.data.slice(1, 6); // Show first 5 rows
+          setPreviewData({ headers, rows });
+        }
+      } catch {
+        // Preview is best-effort, don't block upload
+      }
     }
   }, []);
 
@@ -89,6 +105,7 @@ export function FileUploader({ className }: FileUploaderProps) {
     setStatus("idle");
     setDownloadUrl(null);
     setErrorMessage("");
+    setPreviewData(null);
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -219,6 +236,36 @@ export function FileUploader({ className }: FileUploaderProps) {
           </div>
         )}
       </div>
+
+      {/* Data Preview */}
+      {previewData && file && (
+        <div className="space-y-2 animate-slide-up">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Eye className="w-4 h-4" />
+            <span>Preview (first {previewData.rows.length} rows of {file.name})</span>
+          </div>
+          <div className="border border-border rounded-lg overflow-auto max-h-64">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {previewData.headers.map((h, i) => (
+                    <TableHead key={i} className="whitespace-nowrap">{h}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {previewData.rows.map((row, i) => (
+                  <TableRow key={i}>
+                    {row.map((cell, j) => (
+                      <TableCell key={j} className="max-w-[300px] truncate text-sm">{cell}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {errorMessage && (
