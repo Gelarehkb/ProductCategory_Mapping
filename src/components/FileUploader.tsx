@@ -11,6 +11,36 @@ import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
 
+/**
+ * Merge category paths from "Cats" and "Cats Manual" columns.
+ * Splits by comma or newline, normalizes spacing around arrows,
+ * removes duplicates, and returns merged paths joined by newline.
+ */
+function mergeCategories(cats: string, catsManual: string): string {
+  const normalize = (path: string) =>
+    path.replace(/\s*[-→>]+\s*/g, " -> ").trim();
+
+  const parse = (val: string): string[] =>
+    val
+      .split(/[,\n\r]+/)
+      .map(s => normalize(s))
+      .filter(s => s.length > 0);
+
+  const fromCats = parse(cats);
+  const fromManual = parse(catsManual);
+
+  // Keep cats first, add manual entries that aren't duplicates
+  const seen = new Set(fromCats.map(s => s.toLowerCase()));
+  const merged = [...fromCats];
+  for (const path of fromManual) {
+    if (!seen.has(path.toLowerCase())) {
+      seen.add(path.toLowerCase());
+      merged.push(path);
+    }
+  }
+  return merged.join("\n");
+}
+
 interface FileUploaderProps {
   className?: string;
 }
