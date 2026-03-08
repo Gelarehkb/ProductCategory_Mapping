@@ -298,7 +298,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     for (let li = 0; li < lines.length; li++) {
       const idx = r + li;
       const cols = lines[li].split(/\t/);
-      if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+      if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
       if (cols.length === 1) {
         // Single column paste — put value in current column
         updated[idx] = setCell(updated[idx], c, cols[0].trim());
