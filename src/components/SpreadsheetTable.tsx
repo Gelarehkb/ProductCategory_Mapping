@@ -425,7 +425,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       )}
 
       <p className="text-xs text-muted-foreground">
-        Drag the fill handle ■ to copy values down • Ctrl+C / Ctrl+V • Ctrl+Z / Ctrl+Y
+        Drag the fill handle ■ to copy values down • {isMac ? "⌘" : "Ctrl"}+C / {isMac ? "⌘" : "Ctrl"}+V • {isMac ? "⌘" : "Ctrl"}+Z / {isMac ? "⌘" : "Ctrl"}+Y
       </p>
     </div>
   );
