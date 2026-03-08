@@ -319,7 +319,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const mod = isMac ? "⌘" : "Ctrl";
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 flex flex-col h-full">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
