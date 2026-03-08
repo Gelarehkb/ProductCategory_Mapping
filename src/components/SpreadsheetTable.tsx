@@ -319,7 +319,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const mod = isMac ? "⌘" : "Ctrl";
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 flex flex-col h-full">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -363,7 +363,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       <div
         ref={tableRef}
         tabIndex={0}
-        className="border border-border rounded-lg overflow-auto max-h-[500px] select-none outline-none"
+        className="border border-border rounded-lg overflow-auto flex-1 min-h-0 select-none outline-none"
         onMouseLeave={() => { if (isSelecting) setIsSelecting(false); }}
         onCopy={(e) => {
           if (editingCell || !sel) return;
@@ -488,9 +488,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         </table>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        {t("table.help", { mod })}
-      </p>
     </div>
   );
 }
