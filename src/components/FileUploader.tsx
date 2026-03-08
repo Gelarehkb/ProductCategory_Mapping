@@ -220,7 +220,7 @@ export function FileUploader({ className }: FileUploaderProps) {
         onDragLeave={handleDragLeave}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "upload-zone p-8 text-center cursor-pointer",
+          "upload-zone py-4 px-8 text-center cursor-pointer",
           isDragging && "upload-zone-active",
           status === "success" && "border-success",
           status === "error" && "border-destructive"
@@ -235,9 +235,9 @@ export function FileUploader({ className }: FileUploaderProps) {
         />
 
         {!file ? (
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-secondary flex items-center justify-center">
-              <Upload className="w-7 h-7 text-muted-foreground" />
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0">
+              <Upload className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
               <p className="font-medium text-foreground">{t("upload.drop")}</p>
