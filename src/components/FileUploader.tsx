@@ -174,7 +174,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       setErrorMessage(
         error instanceof Error 
           ? error.message 
-          : "Failed to process file. Please check the file format."
+          : t("upload.errorGeneric")
       );
     }
   };
