@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export interface RowData {
   artikelnummer: string;
   cats: string;
+  catsManual: string;
 }
 
 interface CellRef {
