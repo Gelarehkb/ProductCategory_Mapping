@@ -220,8 +220,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     if (e.button !== 0) return;
     e.preventDefault();
     tableRef.current?.focus();
-    // For artikelnummer column (col 0), single click starts editing immediately
-    if (c === 0 || c === 2) {
+    // For artikelnummer (col 0) and catsManual (col 1), single click starts editing
+    if (c === 0 || c === 1) {
       startEditing(r, c);
       return;
     }
