@@ -24,18 +24,18 @@ interface SpreadsheetTableProps {
   onRowCountChange: (count: number) => void;
 }
 
-const COLS = ["artikelnummer", "cats", "catsManual"] as const;
+const COLS = ["artikelnummer", "catsManual", "cats"] as const;
 
 function cellValue(row: RowData, col: number): string {
   if (col === 0) return row.artikelnummer;
-  if (col === 1) return row.cats;
-  return row.catsManual;
+  if (col === 1) return row.catsManual;
+  return row.cats;
 }
 
 function setCell(row: RowData, col: number, val: string): RowData {
   if (col === 0) return { ...row, artikelnummer: val };
-  if (col === 1) return { ...row, cats: val };
-  return { ...row, catsManual: val };
+  if (col === 1) return { ...row, catsManual: val };
+  return { ...row, cats: val };
 }
 
 function rangeNormalize(a: CellRef, b: CellRef) {
