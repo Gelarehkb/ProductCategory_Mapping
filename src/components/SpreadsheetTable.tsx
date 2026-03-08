@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CategoryPicker } from "@/components/CategoryPicker";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export interface RowData {
