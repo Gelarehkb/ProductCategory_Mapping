@@ -176,7 +176,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       // Typing starts editing (single printable character)
       if (e.key.length === 1 && !mod) {
         const anchor = selStart || { row: 0, col: 0 };
-        if (anchor.col === 0 || anchor.col === 2) {
+        if (anchor.col === 0 || anchor.col === 1) {
           // Clear cell and start editing with the typed char
           pushHistory([...data]);
           const updated = [...data];
