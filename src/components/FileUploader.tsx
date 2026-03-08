@@ -305,7 +305,7 @@ export function FileUploader({ className }: FileUploaderProps) {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
           }}
-          disabled={!tableData.some(r => r.artikelnummer.trim() || r.cats.trim()) || !prefix.trim()}
+          disabled={!tableData.some(r => r.artikelnummer.trim() || r.cats.trim() || r.catsManual.trim()) || !prefix.trim()}
           className="w-full h-11"
         >
           <Download className="w-4 h-4 mr-2" />
