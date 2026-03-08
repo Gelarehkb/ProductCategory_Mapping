@@ -105,7 +105,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const moveSel = useCallback((dr: number, dc: number) => {
     const anchor = selStart || { row: 0, col: 0 };
     const nr = Math.max(0, Math.min(data.length - 1, anchor.row + dr));
-    const nc = Math.max(0, Math.min(1, anchor.col + dc));
+    const nc = Math.max(0, Math.min(2, anchor.col + dc));
     setSelStart({ row: nr, col: nc });
     setSelEnd(null);
     setEditingCell(null);
