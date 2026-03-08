@@ -386,10 +386,10 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           for (let li = 0; li < lines.length; li++) {
             const cols = lines[li].split(/\t|;/);
             const r = sel.r1 + li;
-            if (r >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+            if (r >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
             for (let ci = 0; ci < cols.length; ci++) {
               const c = sel.c1 + ci;
-              if (c <= 1) updated[r] = setCell(updated[r], c, cols[ci].trim());
+              if (c <= 2) updated[r] = setCell(updated[r], c, cols[ci].trim());
             }
           }
           onChange(updated);
