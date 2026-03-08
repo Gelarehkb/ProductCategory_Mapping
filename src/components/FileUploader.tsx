@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/lib/utils";
 import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
 import { SpreadsheetTable, RowData } from "@/components/SpreadsheetTable";
+import { useI18n } from "@/lib/i18n";
 import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
