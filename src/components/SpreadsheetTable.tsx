@@ -305,7 +305,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       } else {
         for (let ci = 0; ci < cols.length; ci++) {
           const col = c + ci;
-          if (col <= 1) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
+          if (col <= 2) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
         }
       }
     }
