@@ -219,7 +219,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     e.preventDefault();
     tableRef.current?.focus();
     // For artikelnummer column (col 0), single click starts editing immediately
-    if (c === 0) {
+    if (c === 0 || c === 2) {
       startEditing(r, c);
       return;
     }
