@@ -401,8 +401,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Artikelnummer</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Cats</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats Manual</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Cats Manual</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats</th>
             </tr>
           </thead>
           <tbody>
