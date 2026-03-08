@@ -48,6 +48,7 @@ function inRange(r: number, c: number, sel: { r1: number; r2: number; c1: number
 }
 
 export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }: SpreadsheetTableProps) {
+  const isMac = useMemo(() => /Mac|iPod|iPhone|iPad/.test(navigator.platform), []);
   const [history, setHistory] = useState<RowData[][]>([]);
   const [future, setFuture] = useState<RowData[][]>([]);
   const [selStart, setSelStart] = useState<CellRef | null>(null);
@@ -425,7 +426,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       )}
 
       <p className="text-xs text-muted-foreground">
-        Drag the fill handle ■ to copy values down • Ctrl+C / Ctrl+V • Ctrl+Z / Ctrl+Y
+        Drag the fill handle ■ to copy values down • {isMac ? "⌘" : "Ctrl"}+C / {isMac ? "⌘" : "Ctrl"}+V • {isMac ? "⌘" : "Ctrl"}+Z / {isMac ? "⌘" : "Ctrl"}+Y
       </p>
     </div>
   );
