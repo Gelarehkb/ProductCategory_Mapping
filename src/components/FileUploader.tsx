@@ -240,9 +240,9 @@ export function FileUploader({ className }: FileUploaderProps) {
               <Upload className="w-7 h-7 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Drop your file here</p>
+              <p className="font-medium text-foreground">{t("upload.drop")}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                or click to browse • CSV, Excel (.xlsx, .xls)
+                {t("upload.browse")}
               </p>
             </div>
           </div>
