@@ -423,7 +423,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       key={c}
                       className={cn(
                         "relative px-0 py-0 border-b border-border",
-                        c === 0 && "border-r",
+                        (c === 0 || c === 1) && "border-r",
                         isSelected && !isFocused && "bg-primary/10",
                         isFocused && !isEditing && "ring-2 ring-inset ring-primary bg-primary/5",
                         isFilling && "bg-primary/5",
