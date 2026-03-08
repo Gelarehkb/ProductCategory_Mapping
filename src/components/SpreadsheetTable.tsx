@@ -176,7 +176,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       // Typing starts editing (single printable character)
       if (e.key.length === 1 && !mod) {
         const anchor = selStart || { row: 0, col: 0 };
-        if (anchor.col === 0 || anchor.col === 2) {
+        if (anchor.col === 0 || anchor.col === 1) {
           // Clear cell and start editing with the typed char
           pushHistory([...data]);
           const updated = [...data];
@@ -220,8 +220,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     if (e.button !== 0) return;
     e.preventDefault();
     tableRef.current?.focus();
-    // For artikelnummer column (col 0), single click starts editing immediately
-    if (c === 0 || c === 2) {
+    // For artikelnummer (col 0) and catsManual (col 1), single click starts editing
+    if (c === 0 || c === 1) {
       startEditing(r, c);
       return;
     }
