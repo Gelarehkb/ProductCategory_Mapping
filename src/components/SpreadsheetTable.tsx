@@ -174,13 +174,13 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       // Typing starts editing (single printable character)
       if (e.key.length === 1 && !mod) {
         const anchor = selStart || { row: 0, col: 0 };
-        if (anchor.col === 0) {
+        if (anchor.col === 0 || anchor.col === 2) {
           // Clear cell and start editing with the typed char
           pushHistory([...data]);
           const updated = [...data];
-          updated[anchor.row] = setCell(updated[anchor.row], 0, e.key);
+          updated[anchor.row] = setCell(updated[anchor.row], anchor.col, e.key);
           onChange(updated);
-          startEditing(anchor.row, 0);
+          startEditing(anchor.row, anchor.col);
           e.preventDefault();
         }
       }
