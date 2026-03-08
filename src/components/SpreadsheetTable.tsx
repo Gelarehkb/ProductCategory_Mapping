@@ -326,7 +326,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           <Button
             variant="ghost" size="icon" className="h-7 w-7"
             onClick={undo} disabled={history.length === 0}
-            title={`Undo (${mod}+Z)`}
+            title={`${t("table.undo")} (${mod}+Z)`}
           >
             <Undo2 className="w-4 h-4" />
           </Button>
