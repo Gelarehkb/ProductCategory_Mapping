@@ -386,15 +386,15 @@ export function FileUploader({ className }: FileUploaderProps) {
         <div className="space-y-4 animate-slide-up">
           <div className="flex items-center gap-2 p-3 rounded-lg bg-success/10 text-success">
             <CheckCircle className="w-4 h-4 flex-shrink-0" />
-            <p className="text-sm font-medium">File processed successfully!</p>
+            <p className="text-sm font-medium">{t("upload.success")}</p>
           </div>
           <div className="flex gap-3">
             <Button onClick={downloadResult} className="flex-1 h-12">
               <Download className="w-5 h-5 mr-2" />
-              Download Result
+              {t("upload.downloadResult")}
             </Button>
             <Button variant="outline" onClick={clearFile} className="h-12">
-              New File
+              {t("upload.newFile")}
             </Button>
           </div>
         </div>

@@ -489,7 +489,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Click to select • Click again or Enter to edit • Arrow keys / Tab to navigate • Fill handle ■ to copy down • {mod}+C / {mod}+V • {mod}+Z / {mod}+Y
+        {t("table.help", { mod })}
       </p>
     </div>
   );
