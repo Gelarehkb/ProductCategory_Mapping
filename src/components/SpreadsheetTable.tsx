@@ -346,7 +346,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
               onRowCountChange(val);
               const newData = [...data];
               if (val > newData.length) {
-                for (let i = newData.length; i < val; i++) newData.push({ artikelnummer: "", cats: "" });
+                for (let i = newData.length; i < val; i++) newData.push({ artikelnummer: "", cats: "", catsManual: "" });
               } else {
                 newData.length = val;
               }
