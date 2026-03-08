@@ -333,7 +333,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           <Button
             variant="ghost" size="icon" className="h-7 w-7"
             onClick={redo} disabled={future.length === 0}
-            title={`Redo (${mod}+Y)`}
+            title={`${t("table.redo")} (${mod}+Y)`}
           >
             <Redo2 className="w-4 h-4" />
           </Button>
