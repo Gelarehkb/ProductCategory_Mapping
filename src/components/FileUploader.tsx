@@ -370,12 +370,12 @@ export function FileUploader({ className }: FileUploaderProps) {
           {status === "processing" ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Processing...
+              {t("upload.processing")}
             </>
           ) : (
             <>
               <Upload className="w-5 h-5 mr-2" />
-              Process File
+              {t("upload.processBtn")}
             </>
           )}
         </Button>
