@@ -284,23 +284,29 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const handlePaste = (r: number, c: number, e: React.ClipboardEvent) => {
     const paste = e.clipboardData.getData("text");
     const lines = paste.split(/\r?\n/).filter(Boolean);
-    if (lines.length > 1 || (lines.length === 1 && lines[0].includes("\t"))) {
-      e.preventDefault();
-      pushHistory([...data]);
-      const updated = [...data];
-      for (let li = 0; li < lines.length; li++) {
-        const idx = r + li;
-        const cols = lines[li].split(/\t|;/);
-        if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+    if (lines.length === 0) return;
+    // Always intercept: distribute pasted lines across rows
+    e.preventDefault();
+    e.stopPropagation();
+    pushHistory([...data]);
+    const updated = [...data];
+    for (let li = 0; li < lines.length; li++) {
+      const idx = r + li;
+      const cols = lines[li].split(/\t/);
+      if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+      if (cols.length === 1) {
+        // Single column paste — put value in current column
+        updated[idx] = setCell(updated[idx], c, cols[0].trim());
+      } else {
         for (let ci = 0; ci < cols.length; ci++) {
           const col = c + ci;
           if (col <= 1) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
         }
       }
-      onChange(updated);
-      if (updated.length > rowCount) onRowCountChange(updated.length);
-      setEditingCell(null);
     }
+    onChange(updated);
+    if (updated.length > rowCount) onRowCountChange(updated.length);
+    setEditingCell(null);
   };
 
   const mod = isMac ? "⌘" : "Ctrl";
