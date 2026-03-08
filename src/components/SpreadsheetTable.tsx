@@ -212,9 +212,13 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const handleCellMouseDown = (r: number, c: number, e: React.MouseEvent) => {
     if (e.button !== 0) return;
     e.preventDefault();
-    // Focus the table container so onCopy/onPaste events fire
     tableRef.current?.focus();
-    // If clicking the already-selected single cell, start editing
+    // For artikelnummer column (col 0), single click starts editing immediately
+    if (c === 0) {
+      startEditing(r, c);
+      return;
+    }
+    // For other columns or multi-select, handle selection
     if (sel && sel.r1 === r && sel.r2 === r && sel.c1 === c && sel.c2 === c && !editingCell) {
       startEditing(r, c);
       return;
