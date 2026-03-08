@@ -402,9 +402,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           <thead className="sticky top-0 z-10 bg-muted">
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Artikelnummer</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Categories</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Category list</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">{t("table.colArtikelnummer")}</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">{t("table.colCategories")}</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">{t("table.colCategoryList")}</th>
             </tr>
           </thead>
           <tbody>
