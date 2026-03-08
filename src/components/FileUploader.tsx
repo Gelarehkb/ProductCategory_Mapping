@@ -352,33 +352,13 @@ export function FileUploader({ className }: FileUploaderProps) {
                     />
                   </TableCell>
                   <TableCell className="py-1 px-1">
-                    <Input
+                    <CategoryPicker
                       value={row.cats}
-                      onChange={(e) => {
+                      onChange={(val) => {
                         const updated = [...tableData];
-                        updated[i] = { ...updated[i], cats: e.target.value };
+                        updated[i] = { ...updated[i], cats: val };
                         setTableData(updated);
                       }}
-                      onPaste={(e) => {
-                        const paste = e.clipboardData.getData("text");
-                        const lines = paste.split(/\r?\n/).filter(Boolean);
-                        if (lines.length > 1) {
-                          e.preventDefault();
-                          const updated = [...tableData];
-                          for (let li = 0; li < lines.length; li++) {
-                            const idx = i + li;
-                            if (idx < updated.length) {
-                              updated[idx] = { ...updated[idx], cats: lines[li] };
-                            } else {
-                              updated.push({ artikelnummer: "", cats: lines[li] });
-                            }
-                          }
-                          setTableData(updated);
-                          setRowCount(updated.length);
-                        }
-                      }}
-                      className="h-8 text-sm border-0 shadow-none focus-visible:ring-1"
-                      placeholder="—"
                     />
                   </TableCell>
                 </TableRow>
