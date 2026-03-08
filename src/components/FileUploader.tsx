@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
+import { CategoryPicker } from "@/components/CategoryPicker";
 import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
