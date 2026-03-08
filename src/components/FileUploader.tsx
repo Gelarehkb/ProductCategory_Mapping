@@ -23,6 +23,10 @@ export function FileUploader({ className }: FileUploaderProps) {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [previewData, setPreviewData] = useState<{ headers: string[]; rows: string[][] } | null>(null);
+  const [rowCount, setRowCount] = useState(10);
+  const [tableData, setTableData] = useState<{ artikelnummer: string; cats: string }[]>(
+    () => Array.from({ length: 10 }, () => ({ artikelnummer: "", cats: "" }))
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const acceptedTypes = [
