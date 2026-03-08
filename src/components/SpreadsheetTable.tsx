@@ -433,23 +433,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       onMouseEnter={() => handleCellMouseEnter(r, c)}
                       onDoubleClick={() => handleCellDoubleClick(r, c)}
                     >
-                      {c === 0 ? (
-                        isEditing ? (
-                          <input
-                            autoFocus
-                            className="w-full h-8 px-2 text-sm bg-background border-2 border-primary rounded-none outline-none"
-                            value={cellValue(row, c)}
-                            onChange={(e) => handleCellChange(r, c, e.target.value)}
-                            onBlur={() => setEditingCell(null)}
-                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
-                            onPaste={(e) => handlePaste(r, c, e)}
-                          />
-                        ) : (
-                          <div className="w-full h-8 px-2 flex items-center text-sm truncate cursor-cell">
-                            {cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}
-                          </div>
-                        )
-                      ) : (
+                      {c === 1 ? (
                         isEditing ? (
                           <input
                             autoFocus
@@ -466,6 +450,22 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                               value={cellValue(row, c)}
                               onChange={(val) => handleCellChange(r, c, val)}
                             />
+                          </div>
+                        )
+                      ) : (
+                        isEditing ? (
+                          <input
+                            autoFocus
+                            className="w-full h-8 px-2 text-sm bg-background border-2 border-primary rounded-none outline-none"
+                            value={cellValue(row, c)}
+                            onChange={(e) => handleCellChange(r, c, e.target.value)}
+                            onBlur={() => setEditingCell(null)}
+                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
+                            onPaste={(e) => handlePaste(r, c, e)}
+                          />
+                        ) : (
+                          <div className="w-full h-8 px-2 flex items-center text-sm truncate cursor-cell">
+                            {cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}
                           </div>
                         )
                       )}
