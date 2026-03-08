@@ -274,10 +274,10 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       e.preventDefault();
       setEditingCell(null);
       if (e.shiftKey) {
-        if (c > 0) { setSelStart({ row: r, col: c - 1 }); setSelEnd(null); }
-        else if (r > 0) { setSelStart({ row: r - 1, col: 1 }); setSelEnd(null); }
+      if (c > 0) { setSelStart({ row: r, col: c - 1 }); setSelEnd(null); }
+        else if (r > 0) { setSelStart({ row: r - 1, col: 2 }); setSelEnd(null); }
       } else {
-        if (c < 1) { setSelStart({ row: r, col: c + 1 }); setSelEnd(null); }
+        if (c < 2) { setSelStart({ row: r, col: c + 1 }); setSelEnd(null); }
         else if (r < data.length - 1) { setSelStart({ row: r + 1, col: 0 }); setSelEnd(null); }
       }
     }
