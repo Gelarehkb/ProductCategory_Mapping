@@ -24,7 +24,7 @@ interface SpreadsheetTableProps {
   onRowCountChange: (count: number) => void;
 }
 
-const COLS = ["artikelnummer", "cats"] as const;
+const COLS = ["artikelnummer", "cats", "catsManual"] as const;
 
 function cellValue(row: RowData, col: number): string {
   return col === 0 ? row.artikelnummer : row.cats;
