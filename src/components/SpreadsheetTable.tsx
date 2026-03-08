@@ -488,9 +488,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         </table>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        {t("table.help", { mod })}
-      </p>
     </div>
   );
 }
