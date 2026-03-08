@@ -348,7 +348,7 @@ export function FileUploader({ className }: FileUploaderProps) {
           className="w-full h-11"
         >
           <Download className="w-4 h-4 mr-2" />
-          Download CSV
+          {t("upload.downloadCsv")}
         </Button>
       </div>
 
