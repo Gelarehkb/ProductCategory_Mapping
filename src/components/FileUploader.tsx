@@ -47,6 +47,7 @@ interface FileUploaderProps {
 }
 
 export function FileUploader({ className }: FileUploaderProps) {
+  const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [prefix, setPrefix] = useState<string>("OUTPUT");
   const [status, setStatus] = useState<UploadStatus>("idle");
