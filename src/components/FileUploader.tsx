@@ -75,12 +75,12 @@ export function FileUploader({ className }: FileUploaderProps) {
       file.name.endsWith(".xls");
     
     if (!isValidType) {
-      setErrorMessage("Please upload a CSV or Excel file (.csv, .xlsx, .xls)");
+      setErrorMessage(t("upload.errorFormat"));
       return false;
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      setErrorMessage("File size must be less than 50MB");
+      setErrorMessage(t("upload.errorSize"));
       return false;
     }
 
