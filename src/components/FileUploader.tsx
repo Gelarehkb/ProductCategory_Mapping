@@ -307,7 +307,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       {/* Or Divider */}
       <div className="flex items-center gap-4 py-2">
         <div className="flex-1 h-px bg-border" />
-        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Or</span>
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("upload.or")}</span>
         <div className="flex-1 h-px bg-border" />
       </div>
 
@@ -315,7 +315,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       <div className="space-y-3">
         <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
           <Grid3X3 className="w-4 h-4" />
-          <span>Enter columns manually below</span>
+          <span>{t("upload.manual")}</span>
         </div>
         <SpreadsheetTable
           data={tableData}
