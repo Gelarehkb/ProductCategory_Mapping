@@ -433,7 +433,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       onMouseEnter={() => handleCellMouseEnter(r, c)}
                       onDoubleClick={() => handleCellDoubleClick(r, c)}
                     >
-                      {c === 1 ? (
+                      {c === 2 ? (
                         isEditing ? (
                           <input
                             autoFocus
