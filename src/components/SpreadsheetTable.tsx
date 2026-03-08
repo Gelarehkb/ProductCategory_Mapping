@@ -143,9 +143,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         const anchor = selStart || { row: 0, col: 0 };
         if (e.shiftKey) {
           if (anchor.col > 0) moveSel(0, -1);
-          else if (anchor.row > 0) { setSelStart({ row: anchor.row - 1, col: 1 }); setSelEnd(null); }
+          else if (anchor.row > 0) { setSelStart({ row: anchor.row - 1, col: 2 }); setSelEnd(null); }
         } else {
-          if (anchor.col < 1) moveSel(0, 1);
+          if (anchor.col < 2) moveSel(0, 1);
           else if (anchor.row < data.length - 1) { setSelStart({ row: anchor.row + 1, col: 0 }); setSelEnd(null); }
         }
         return;
