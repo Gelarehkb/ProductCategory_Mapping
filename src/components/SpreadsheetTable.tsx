@@ -112,7 +112,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     setSelEnd(null);
   }, []);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (no clipboard here — handled via onCopy/onPaste on the div)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;
@@ -120,19 +120,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       // Undo/Redo
       if (mod && e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(); return; }
       if (mod && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); redo(); return; }
-
-      // Copy
-      if (mod && e.key === "c" && sel && !editingCell) {
-        e.preventDefault();
-        const lines: string[] = [];
-        for (let r = sel.r1; r <= sel.r2; r++) {
-          const parts: string[] = [];
-          for (let c = sel.c1; c <= sel.c2; c++) parts.push(cellValue(data[r], c));
-          lines.push(parts.join("\t"));
-        }
-        navigator.clipboard.writeText(lines.join("\n"));
-        return;
-      }
 
       // Don't handle navigation keys while editing
       if (editingCell) return;
@@ -359,6 +346,17 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         tabIndex={0}
         className="border border-border rounded-lg overflow-auto max-h-[500px] select-none outline-none"
         onMouseLeave={() => { if (isSelecting) setIsSelecting(false); }}
+        onCopy={(e) => {
+          if (editingCell || !sel) return;
+          e.preventDefault();
+          const lines: string[] = [];
+          for (let r = sel.r1; r <= sel.r2; r++) {
+            const parts: string[] = [];
+            for (let c = sel.c1; c <= sel.c2; c++) parts.push(cellValue(data[r], c));
+            lines.push(parts.join("\t"));
+          }
+          e.clipboardData.setData("text/plain", lines.join("\n"));
+        }}
         onPaste={(e) => {
           if (editingCell) return;
           if (!sel) return;
