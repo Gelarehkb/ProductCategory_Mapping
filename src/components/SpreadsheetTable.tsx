@@ -346,6 +346,17 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         tabIndex={0}
         className="border border-border rounded-lg overflow-auto max-h-[500px] select-none outline-none"
         onMouseLeave={() => { if (isSelecting) setIsSelecting(false); }}
+        onCopy={(e) => {
+          if (editingCell || !sel) return;
+          e.preventDefault();
+          const lines: string[] = [];
+          for (let r = sel.r1; r <= sel.r2; r++) {
+            const parts: string[] = [];
+            for (let c = sel.c1; c <= sel.c2; c++) parts.push(cellValue(data[r], c));
+            lines.push(parts.join("\t"));
+          }
+          e.clipboardData.setData("text/plain", lines.join("\n"));
+        }}
         onPaste={(e) => {
           if (editingCell) return;
           if (!sel) return;
