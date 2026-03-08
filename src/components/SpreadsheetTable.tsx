@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export interface RowData {
   artikelnummer: string;
   cats: string;
+  catsManual: string;
 }
 
 interface CellRef {
@@ -23,14 +24,18 @@ interface SpreadsheetTableProps {
   onRowCountChange: (count: number) => void;
 }
 
-const COLS = ["artikelnummer", "cats"] as const;
+const COLS = ["artikelnummer", "cats", "catsManual"] as const;
 
 function cellValue(row: RowData, col: number): string {
-  return col === 0 ? row.artikelnummer : row.cats;
+  if (col === 0) return row.artikelnummer;
+  if (col === 1) return row.cats;
+  return row.catsManual;
 }
 
 function setCell(row: RowData, col: number, val: string): RowData {
-  return col === 0 ? { ...row, artikelnummer: val } : { ...row, cats: val };
+  if (col === 0) return { ...row, artikelnummer: val };
+  if (col === 1) return { ...row, cats: val };
+  return { ...row, catsManual: val };
 }
 
 function rangeNormalize(a: CellRef, b: CellRef) {
@@ -100,7 +105,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const moveSel = useCallback((dr: number, dc: number) => {
     const anchor = selStart || { row: 0, col: 0 };
     const nr = Math.max(0, Math.min(data.length - 1, anchor.row + dr));
-    const nc = Math.max(0, Math.min(1, anchor.col + dc));
+    const nc = Math.max(0, Math.min(2, anchor.col + dc));
     setSelStart({ row: nr, col: nc });
     setSelEnd(null);
     setEditingCell(null);
@@ -138,9 +143,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         const anchor = selStart || { row: 0, col: 0 };
         if (e.shiftKey) {
           if (anchor.col > 0) moveSel(0, -1);
-          else if (anchor.row > 0) { setSelStart({ row: anchor.row - 1, col: 1 }); setSelEnd(null); }
+          else if (anchor.row > 0) { setSelStart({ row: anchor.row - 1, col: 2 }); setSelEnd(null); }
         } else {
-          if (anchor.col < 1) moveSel(0, 1);
+          if (anchor.col < 2) moveSel(0, 1);
           else if (anchor.row < data.length - 1) { setSelStart({ row: anchor.row + 1, col: 0 }); setSelEnd(null); }
         }
         return;
@@ -169,13 +174,13 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       // Typing starts editing (single printable character)
       if (e.key.length === 1 && !mod) {
         const anchor = selStart || { row: 0, col: 0 };
-        if (anchor.col === 0) {
+        if (anchor.col === 0 || anchor.col === 2) {
           // Clear cell and start editing with the typed char
           pushHistory([...data]);
           const updated = [...data];
-          updated[anchor.row] = setCell(updated[anchor.row], 0, e.key);
+          updated[anchor.row] = setCell(updated[anchor.row], anchor.col, e.key);
           onChange(updated);
-          startEditing(anchor.row, 0);
+          startEditing(anchor.row, anchor.col);
           e.preventDefault();
         }
       }
@@ -191,7 +196,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         pushHistory([...data]);
         const updated = [...data];
         for (let r = fillRange.r1; r <= fillRange.r2; r++) {
-          if (r >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+          if (r >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
           for (let c = fillRange.c1; c <= fillRange.c2; c++) {
             const srcRow = sel.r1 + ((r - fillRange.r1) % (sel.r2 - sel.r1 + 1));
             updated[r] = setCell(updated[r], c, cellValue(data[srcRow], c));
@@ -214,7 +219,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     e.preventDefault();
     tableRef.current?.focus();
     // For artikelnummer column (col 0), single click starts editing immediately
-    if (c === 0) {
+    if (c === 0 || c === 2) {
       startEditing(r, c);
       return;
     }
@@ -269,10 +274,10 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       e.preventDefault();
       setEditingCell(null);
       if (e.shiftKey) {
-        if (c > 0) { setSelStart({ row: r, col: c - 1 }); setSelEnd(null); }
-        else if (r > 0) { setSelStart({ row: r - 1, col: 1 }); setSelEnd(null); }
+      if (c > 0) { setSelStart({ row: r, col: c - 1 }); setSelEnd(null); }
+        else if (r > 0) { setSelStart({ row: r - 1, col: 2 }); setSelEnd(null); }
       } else {
-        if (c < 1) { setSelStart({ row: r, col: c + 1 }); setSelEnd(null); }
+        if (c < 2) { setSelStart({ row: r, col: c + 1 }); setSelEnd(null); }
         else if (r < data.length - 1) { setSelStart({ row: r + 1, col: 0 }); setSelEnd(null); }
       }
     }
@@ -293,14 +298,14 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     for (let li = 0; li < lines.length; li++) {
       const idx = r + li;
       const cols = lines[li].split(/\t/);
-      if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+      if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
       if (cols.length === 1) {
         // Single column paste — put value in current column
         updated[idx] = setCell(updated[idx], c, cols[0].trim());
       } else {
         for (let ci = 0; ci < cols.length; ci++) {
           const col = c + ci;
-          if (col <= 1) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
+          if (col <= 2) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
         }
       }
     }
@@ -341,7 +346,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
               onRowCountChange(val);
               const newData = [...data];
               if (val > newData.length) {
-                for (let i = newData.length; i < val; i++) newData.push({ artikelnummer: "", cats: "" });
+                for (let i = newData.length; i < val; i++) newData.push({ artikelnummer: "", cats: "", catsManual: "" });
               } else {
                 newData.length = val;
               }
@@ -381,10 +386,10 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           for (let li = 0; li < lines.length; li++) {
             const cols = lines[li].split(/\t|;/);
             const r = sel.r1 + li;
-            if (r >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+            if (r >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
             for (let ci = 0; ci < cols.length; ci++) {
               const c = sel.c1 + ci;
-              if (c <= 1) updated[r] = setCell(updated[r], c, cols[ci].trim());
+              if (c <= 2) updated[r] = setCell(updated[r], c, cols[ci].trim());
             }
           }
           onChange(updated);
@@ -396,7 +401,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Artikelnummer</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Cats</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats Manual</th>
             </tr>
           </thead>
           <tbody>
@@ -417,7 +423,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       key={c}
                       className={cn(
                         "relative px-0 py-0 border-b border-border",
-                        c === 0 && "border-r",
+                        (c === 0 || c === 1) && "border-r",
                         isSelected && !isFocused && "bg-primary/10",
                         isFocused && !isEditing && "ring-2 ring-inset ring-primary bg-primary/5",
                         isFilling && "bg-primary/5",
@@ -427,23 +433,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       onMouseEnter={() => handleCellMouseEnter(r, c)}
                       onDoubleClick={() => handleCellDoubleClick(r, c)}
                     >
-                      {c === 0 ? (
-                        isEditing ? (
-                          <input
-                            autoFocus
-                            className="w-full h-8 px-2 text-sm bg-background border-2 border-primary rounded-none outline-none"
-                            value={cellValue(row, c)}
-                            onChange={(e) => handleCellChange(r, c, e.target.value)}
-                            onBlur={() => setEditingCell(null)}
-                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
-                            onPaste={(e) => handlePaste(r, c, e)}
-                          />
-                        ) : (
-                          <div className="w-full h-8 px-2 flex items-center text-sm truncate cursor-cell">
-                            {cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}
-                          </div>
-                        )
-                      ) : (
+                      {c === 1 ? (
                         isEditing ? (
                           <input
                             autoFocus
@@ -460,6 +450,22 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                               value={cellValue(row, c)}
                               onChange={(val) => handleCellChange(r, c, val)}
                             />
+                          </div>
+                        )
+                      ) : (
+                        isEditing ? (
+                          <input
+                            autoFocus
+                            className="w-full h-8 px-2 text-sm bg-background border-2 border-primary rounded-none outline-none"
+                            value={cellValue(row, c)}
+                            onChange={(e) => handleCellChange(r, c, e.target.value)}
+                            onBlur={() => setEditingCell(null)}
+                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
+                            onPaste={(e) => handlePaste(r, c, e)}
+                          />
+                        ) : (
+                          <div className="w-full h-8 px-2 flex items-center text-sm truncate cursor-cell">
+                            {cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}
                           </div>
                         )
                       )}
