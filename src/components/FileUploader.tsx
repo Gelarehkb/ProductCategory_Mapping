@@ -302,11 +302,18 @@ export function FileUploader({ className }: FileUploaderProps) {
         </div>
       )}
 
+      {/* Or Divider */}
+      <div className="flex items-center gap-4 py-2">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Or</span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
       {/* Manual Table Input */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+        <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
           <Grid3X3 className="w-4 h-4" />
-          <span>Manual Input</span>
+          <span>Enter columns manually below</span>
         </div>
         <SpreadsheetTable
           data={tableData}
