@@ -27,11 +27,15 @@ interface SpreadsheetTableProps {
 const COLS = ["artikelnummer", "cats", "catsManual"] as const;
 
 function cellValue(row: RowData, col: number): string {
-  return col === 0 ? row.artikelnummer : row.cats;
+  if (col === 0) return row.artikelnummer;
+  if (col === 1) return row.cats;
+  return row.catsManual;
 }
 
 function setCell(row: RowData, col: number, val: string): RowData {
-  return col === 0 ? { ...row, artikelnummer: val } : { ...row, cats: val };
+  if (col === 0) return { ...row, artikelnummer: val };
+  if (col === 1) return { ...row, cats: val };
+  return { ...row, catsManual: val };
 }
 
 function rangeNormalize(a: CellRef, b: CellRef) {
