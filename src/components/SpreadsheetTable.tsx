@@ -48,6 +48,7 @@ function inRange(r: number, c: number, sel: { r1: number; r2: number; c1: number
 }
 
 export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }: SpreadsheetTableProps) {
+  const isMac = useMemo(() => /Mac|iPod|iPhone|iPad/.test(navigator.platform), []);
   const [history, setHistory] = useState<RowData[][]>([]);
   const [future, setFuture] = useState<RowData[][]>([]);
   const [selStart, setSelStart] = useState<CellRef | null>(null);
