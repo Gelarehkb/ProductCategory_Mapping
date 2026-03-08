@@ -196,7 +196,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         pushHistory([...data]);
         const updated = [...data];
         for (let r = fillRange.r1; r <= fillRange.r2; r++) {
-          if (r >= updated.length) updated.push({ artikelnummer: "", cats: "" });
+          if (r >= updated.length) updated.push({ artikelnummer: "", cats: "", catsManual: "" });
           for (let c = fillRange.c1; c <= fillRange.c2; c++) {
             const srcRow = sel.r1 + ((r - fillRange.r1) % (sel.r2 - sel.r1 + 1));
             updated[r] = setCell(updated[r], c, cellValue(data[srcRow], c));
