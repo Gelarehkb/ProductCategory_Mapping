@@ -26,7 +26,7 @@ export function FileUploader({ className }: FileUploaderProps) {
   const [previewData, setPreviewData] = useState<{ headers: string[]; rows: string[][] } | null>(null);
   const [rowCount, setRowCount] = useState(10);
   const [tableData, setTableData] = useState<RowData[]>(
-    () => Array.from({ length: 10 }, () => ({ artikelnummer: "", cats: "" }))
+    () => Array.from({ length: 10 }, () => ({ artikelnummer: "", cats: "", catsManual: "" }))
   );
   const inputRef = useRef<HTMLInputElement>(null);
 
