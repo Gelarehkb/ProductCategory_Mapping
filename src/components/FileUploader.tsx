@@ -200,16 +200,16 @@ export function FileUploader({ className }: FileUploaderProps) {
     <div className={cn("w-full max-w-xl mx-auto space-y-6 animate-slide-up", className)}>
       {/* Prefix Input */}
       <div className="space-y-2">
-        <Label htmlFor="prefix">Output File Prefix</Label>
+        <Label htmlFor="prefix">{t("prefix.label")}</Label>
         <Input
           id="prefix"
           value={prefix}
           onChange={(e) => setPrefix(e.target.value)}
-          placeholder="Enter prefix for output filename"
+          placeholder={t("prefix.placeholder")}
           className="h-11"
         />
         <p className="text-xs text-muted-foreground">
-          Output: {generateOutputFilename(prefix)}
+          {t("prefix.output")} {generateOutputFilename(prefix)}
         </p>
       </div>
 
