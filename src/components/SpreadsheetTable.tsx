@@ -307,9 +307,33 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       {/* Table */}
       <div
         ref={tableRef}
-        className="border border-border rounded-lg overflow-auto max-h-[500px] select-none"
+        tabIndex={0}
+        className="border border-border rounded-lg overflow-auto max-h-[500px] select-none outline-none"
         onMouseLeave={() => {
           if (isSelecting) setIsSelecting(false);
+        }}
+        onPaste={(e) => {
+          if (editingCell) return; // let the input handle it
+          if (!sel) return;
+          e.preventDefault();
+          const paste = e.clipboardData.getData("text");
+          const lines = paste.split(/\r?\n/).filter(Boolean);
+          if (lines.length === 0) return;
+          pushHistory([...data]);
+          const updated = [...data];
+          for (let li = 0; li < lines.length; li++) {
+            const cols = lines[li].split(/\t|;/);
+            const r = sel.r1 + li;
+            if (r >= updated.length) {
+              updated.push({ artikelnummer: "", cats: "" });
+            }
+            for (let ci = 0; ci < cols.length; ci++) {
+              const c = sel.c1 + ci;
+              if (c <= 1) updated[r] = setCell(updated[r], c, cols[ci].trim());
+            }
+          }
+          onChange(updated);
+          if (updated.length > rowCount) onRowCountChange(updated.length);
         }}
       >
         <table className="w-full text-sm border-collapse">
