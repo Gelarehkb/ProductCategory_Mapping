@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CategoryPicker } from "@/components/CategoryPicker";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export interface RowData {
@@ -53,6 +54,7 @@ function inRange(r: number, c: number, sel: { r1: number; r2: number; c1: number
 }
 
 export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }: SpreadsheetTableProps) {
+  const { t } = useI18n();
   const isMac = useMemo(() => /Mac|iPod|iPhone|iPad/.test(navigator.platform), []);
   const [history, setHistory] = useState<RowData[][]>([]);
   const [future, setFuture] = useState<RowData[][]>([]);
@@ -324,20 +326,20 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           <Button
             variant="ghost" size="icon" className="h-7 w-7"
             onClick={undo} disabled={history.length === 0}
-            title={`Undo (${mod}+Z)`}
+            title={`${t("table.undo")} (${mod}+Z)`}
           >
             <Undo2 className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost" size="icon" className="h-7 w-7"
             onClick={redo} disabled={future.length === 0}
-            title={`Redo (${mod}+Y)`}
+            title={`${t("table.redo")} (${mod}+Y)`}
           >
             <Redo2 className="w-4 h-4" />
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Label htmlFor="rowCount" className="text-xs text-muted-foreground">Rows:</Label>
+          <Label htmlFor="rowCount" className="text-xs text-muted-foreground">{t("table.rows")}</Label>
           <Input
             id="rowCount" type="number" min={1} max={500}
             value={rowCount}
@@ -400,9 +402,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           <thead className="sticky top-0 z-10 bg-muted">
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Artikelnummer</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Categories</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Category list</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">{t("table.colArtikelnummer")}</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">{t("table.colCategories")}</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">{t("table.colCategoryList")}</th>
             </tr>
           </thead>
           <tbody>
@@ -487,7 +489,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Click to select • Click again or Enter to edit • Arrow keys / Tab to navigate • Fill handle ■ to copy down • {mod}+C / {mod}+V • {mod}+Z / {mod}+Y
+        {t("table.help", { mod })}
       </p>
     </div>
   );

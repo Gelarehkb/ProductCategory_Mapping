@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/lib/utils";
 import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
 import { SpreadsheetTable, RowData } from "@/components/SpreadsheetTable";
+import { useI18n } from "@/lib/i18n";
 import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
@@ -46,6 +47,7 @@ interface FileUploaderProps {
 }
 
 export function FileUploader({ className }: FileUploaderProps) {
+  const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [prefix, setPrefix] = useState<string>("OUTPUT");
   const [status, setStatus] = useState<UploadStatus>("idle");
@@ -73,12 +75,12 @@ export function FileUploader({ className }: FileUploaderProps) {
       file.name.endsWith(".xls");
     
     if (!isValidType) {
-      setErrorMessage("Please upload a CSV or Excel file (.csv, .xlsx, .xls)");
+      setErrorMessage(t("upload.errorFormat"));
       return false;
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      setErrorMessage("File size must be less than 50MB");
+      setErrorMessage(t("upload.errorSize"));
       return false;
     }
 
@@ -172,7 +174,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       setErrorMessage(
         error instanceof Error 
           ? error.message 
-          : "Failed to process file. Please check the file format."
+          : t("upload.errorGeneric")
       );
     }
   };
@@ -198,16 +200,16 @@ export function FileUploader({ className }: FileUploaderProps) {
     <div className={cn("w-full max-w-xl mx-auto space-y-6 animate-slide-up", className)}>
       {/* Prefix Input */}
       <div className="space-y-2">
-        <Label htmlFor="prefix">Output File Prefix</Label>
+        <Label htmlFor="prefix">{t("prefix.label")}</Label>
         <Input
           id="prefix"
           value={prefix}
           onChange={(e) => setPrefix(e.target.value)}
-          placeholder="Enter prefix for output filename"
+          placeholder={t("prefix.placeholder")}
           className="h-11"
         />
         <p className="text-xs text-muted-foreground">
-          Output: {generateOutputFilename(prefix)}
+          {t("prefix.output")} {generateOutputFilename(prefix)}
         </p>
       </div>
 
@@ -238,9 +240,9 @@ export function FileUploader({ className }: FileUploaderProps) {
               <Upload className="w-7 h-7 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Drop your file here</p>
+              <p className="font-medium text-foreground">{t("upload.drop")}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                or click to browse • CSV, Excel (.xlsx, .xls)
+                {t("upload.browse")}
               </p>
             </div>
           </div>
@@ -277,7 +279,7 @@ export function FileUploader({ className }: FileUploaderProps) {
         <div className="space-y-2 animate-slide-up">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Eye className="w-4 h-4" />
-            <span>Preview (first {previewData.rows.length} rows of {file.name})</span>
+            <span>{t("upload.preview", { count: String(previewData.rows.length), name: file.name })}</span>
           </div>
           <div className="border border-border rounded-lg overflow-auto max-h-64">
             <Table>
@@ -305,7 +307,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       {/* Or Divider */}
       <div className="flex items-center gap-4 py-2">
         <div className="flex-1 h-px bg-border" />
-        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Or</span>
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("upload.or")}</span>
         <div className="flex-1 h-px bg-border" />
       </div>
 
@@ -313,7 +315,7 @@ export function FileUploader({ className }: FileUploaderProps) {
       <div className="space-y-3">
         <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
           <Grid3X3 className="w-4 h-4" />
-          <span>Enter columns manually below</span>
+          <span>{t("upload.manual")}</span>
         </div>
         <SpreadsheetTable
           data={tableData}
@@ -346,7 +348,7 @@ export function FileUploader({ className }: FileUploaderProps) {
           className="w-full h-11"
         >
           <Download className="w-4 h-4 mr-2" />
-          Download CSV
+          {t("upload.downloadCsv")}
         </Button>
       </div>
 
@@ -368,12 +370,12 @@ export function FileUploader({ className }: FileUploaderProps) {
           {status === "processing" ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Processing...
+              {t("upload.processing")}
             </>
           ) : (
             <>
               <Upload className="w-5 h-5 mr-2" />
-              Process File
+              {t("upload.processBtn")}
             </>
           )}
         </Button>
@@ -384,15 +386,15 @@ export function FileUploader({ className }: FileUploaderProps) {
         <div className="space-y-4 animate-slide-up">
           <div className="flex items-center gap-2 p-3 rounded-lg bg-success/10 text-success">
             <CheckCircle className="w-4 h-4 flex-shrink-0" />
-            <p className="text-sm font-medium">File processed successfully!</p>
+            <p className="text-sm font-medium">{t("upload.success")}</p>
           </div>
           <div className="flex gap-3">
             <Button onClick={downloadResult} className="flex-1 h-12">
               <Download className="w-5 h-5 mr-2" />
-              Download Result
+              {t("upload.downloadResult")}
             </Button>
             <Button variant="outline" onClick={clearFile} className="h-12">
-              New File
+              {t("upload.newFile")}
             </Button>
           </div>
         </div>
