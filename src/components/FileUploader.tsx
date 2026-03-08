@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle, Eye, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { processCategories, generateOutputFilename } from "@/lib/categoryProcessor";
-import { CategoryPicker } from "@/components/CategoryPicker";
+import { SpreadsheetTable, RowData } from "@/components/SpreadsheetTable";
 import Papa from "papaparse";
 
 type UploadStatus = "idle" | "processing" | "success" | "error";
