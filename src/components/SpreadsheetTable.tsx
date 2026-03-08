@@ -24,18 +24,18 @@ interface SpreadsheetTableProps {
   onRowCountChange: (count: number) => void;
 }
 
-const COLS = ["artikelnummer", "cats", "catsManual"] as const;
+const COLS = ["artikelnummer", "catsManual", "cats"] as const;
 
 function cellValue(row: RowData, col: number): string {
   if (col === 0) return row.artikelnummer;
-  if (col === 1) return row.cats;
-  return row.catsManual;
+  if (col === 1) return row.catsManual;
+  return row.cats;
 }
 
 function setCell(row: RowData, col: number, val: string): RowData {
   if (col === 0) return { ...row, artikelnummer: val };
-  if (col === 1) return { ...row, cats: val };
-  return { ...row, catsManual: val };
+  if (col === 1) return { ...row, catsManual: val };
+  return { ...row, cats: val };
 }
 
 function rangeNormalize(a: CellRef, b: CellRef) {
@@ -401,8 +401,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Artikelnummer</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Cats</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats Manual</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-r border-border">Cats Manual</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground border-b border-border">Cats</th>
             </tr>
           </thead>
           <tbody>
@@ -433,7 +433,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       onMouseEnter={() => handleCellMouseEnter(r, c)}
                       onDoubleClick={() => handleCellDoubleClick(r, c)}
                     >
-                      {c === 1 ? (
+                      {c === 2 ? (
                         isEditing ? (
                           <input
                             autoFocus
