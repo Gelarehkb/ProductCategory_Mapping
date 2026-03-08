@@ -279,7 +279,7 @@ export function FileUploader({ className }: FileUploaderProps) {
         <div className="space-y-2 animate-slide-up">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Eye className="w-4 h-4" />
-            <span>Preview (first {previewData.rows.length} rows of {file.name})</span>
+            <span>{t("upload.preview", { count: String(previewData.rows.length), name: file.name })}</span>
           </div>
           <div className="border border-border rounded-lg overflow-auto max-h-64">
             <Table>
