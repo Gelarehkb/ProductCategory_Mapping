@@ -13,7 +13,7 @@ export interface RowData {
 
 interface CellRef {
   row: number;
-  col: number; // 0 = artikelnummer, 1 = cats
+  col: number;
 }
 
 interface SpreadsheetTableProps {
@@ -54,7 +54,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const [selStart, setSelStart] = useState<CellRef | null>(null);
   const [selEnd, setSelEnd] = useState<CellRef | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [fillFrom, setFillFrom] = useState<CellRef | null>(null);
   const [fillTo, setFillTo] = useState<number | null>(null);
   const [isDraggingFill, setIsDraggingFill] = useState(false);
   const [editingCell, setEditingCell] = useState<CellRef | null>(null);
@@ -82,8 +81,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       const prev = h[h.length - 1];
       setFuture(f => [...f, data]);
       onChange(prev);
-      const newLen = prev.length;
-      if (newLen !== rowCount) onRowCountChange(newLen);
+      if (prev.length !== rowCount) onRowCountChange(prev.length);
       return h.slice(0, -1);
     });
   }, [data, onChange, rowCount, onRowCountChange]);
@@ -94,77 +92,110 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       const next = f[f.length - 1];
       setHistory(h => [...h, data]);
       onChange(next);
-      const newLen = next.length;
-      if (newLen !== rowCount) onRowCountChange(newLen);
+      if (next.length !== rowCount) onRowCountChange(next.length);
       return f.slice(0, -1);
     });
   }, [data, onChange, rowCount, onRowCountChange]);
 
+  const moveSel = useCallback((dr: number, dc: number) => {
+    const anchor = selStart || { row: 0, col: 0 };
+    const nr = Math.max(0, Math.min(data.length - 1, anchor.row + dr));
+    const nc = Math.max(0, Math.min(1, anchor.col + dc));
+    setSelStart({ row: nr, col: nc });
+    setSelEnd(null);
+    setEditingCell(null);
+  }, [selStart, data.length]);
+
+  const startEditing = useCallback((r: number, c: number) => {
+    setEditingCell({ row: r, col: c });
+    setSelStart({ row: r, col: c });
+    setSelEnd(null);
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
-        e.preventDefault();
-        undo();
-      }
-      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
-        e.preventDefault();
-        redo();
-      }
+      const mod = e.ctrlKey || e.metaKey;
+
+      // Undo/Redo
+      if (mod && e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(); return; }
+      if (mod && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); redo(); return; }
+
       // Copy
-      if ((e.ctrlKey || e.metaKey) && e.key === "c" && sel && !editingCell) {
+      if (mod && e.key === "c" && sel && !editingCell) {
         e.preventDefault();
         const lines: string[] = [];
         for (let r = sel.r1; r <= sel.r2; r++) {
           const parts: string[] = [];
-          for (let c = sel.c1; c <= sel.c2; c++) {
-            parts.push(cellValue(data[r], c));
-          }
+          for (let c = sel.c1; c <= sel.c2; c++) parts.push(cellValue(data[r], c));
           lines.push(parts.join("\t"));
         }
         navigator.clipboard.writeText(lines.join("\n"));
+        return;
       }
-      // Paste
-      if ((e.ctrlKey || e.metaKey) && e.key === "v" && sel && !editingCell) {
+
+      // Don't handle navigation keys while editing
+      if (editingCell) return;
+
+      if (!sel) return;
+
+      // Arrow keys
+      if (e.key === "ArrowDown") { e.preventDefault(); moveSel(1, 0); return; }
+      if (e.key === "ArrowUp") { e.preventDefault(); moveSel(-1, 0); return; }
+      if (e.key === "ArrowRight") { e.preventDefault(); moveSel(0, 1); return; }
+      if (e.key === "ArrowLeft") { e.preventDefault(); moveSel(0, -1); return; }
+
+      // Tab moves right, then wraps to next row
+      if (e.key === "Tab") {
         e.preventDefault();
-        navigator.clipboard.readText().then(text => {
-          const lines = text.split(/\r?\n/).filter(Boolean);
-          if (lines.length === 0) return;
-          pushHistory([...data]);
-          const updated = [...data];
-          for (let li = 0; li < lines.length; li++) {
-            const cols = lines[li].split(/\t|;/);
-            const r = sel.r1 + li;
-            if (r >= updated.length) {
-              updated.push({ artikelnummer: "", cats: "" });
-            }
-            for (let ci = 0; ci < cols.length; ci++) {
-              const c = sel.c1 + ci;
-              if (c <= 1) {
-                updated[r] = setCell(updated[r], c, cols[ci]);
-              }
-            }
-          }
-          onChange(updated);
-          if (updated.length > rowCount) onRowCountChange(updated.length);
-        });
+        const anchor = selStart || { row: 0, col: 0 };
+        if (e.shiftKey) {
+          if (anchor.col > 0) moveSel(0, -1);
+          else if (anchor.row > 0) { setSelStart({ row: anchor.row - 1, col: 1 }); setSelEnd(null); }
+        } else {
+          if (anchor.col < 1) moveSel(0, 1);
+          else if (anchor.row < data.length - 1) { setSelStart({ row: anchor.row + 1, col: 0 }); setSelEnd(null); }
+        }
+        return;
       }
-      // Delete
-      if ((e.key === "Delete" || e.key === "Backspace") && sel && !editingCell) {
+
+      // Enter starts editing or moves down
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const anchor = selStart || { row: 0, col: 0 };
+        startEditing(anchor.row, anchor.col);
+        return;
+      }
+
+      // Delete/Backspace clears selection
+      if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
         pushHistory([...data]);
         const updated = [...data];
         for (let r = sel.r1; r <= sel.r2; r++) {
-          for (let c = sel.c1; c <= sel.c2; c++) {
-            updated[r] = setCell(updated[r], c, "");
-          }
+          for (let c = sel.c1; c <= sel.c2; c++) updated[r] = setCell(updated[r], c, "");
         }
         onChange(updated);
+        return;
+      }
+
+      // Typing starts editing (single printable character)
+      if (e.key.length === 1 && !mod) {
+        const anchor = selStart || { row: 0, col: 0 };
+        if (anchor.col === 0) {
+          // Clear cell and start editing with the typed char
+          pushHistory([...data]);
+          const updated = [...data];
+          updated[anchor.row] = setCell(updated[anchor.row], 0, e.key);
+          onChange(updated);
+          startEditing(anchor.row, 0);
+          e.preventDefault();
+        }
       }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [sel, data, editingCell, undo, redo, onChange, pushHistory, rowCount, onRowCountChange]);
+  }, [sel, data, editingCell, undo, redo, onChange, pushHistory, rowCount, onRowCountChange, moveSel, selStart, startEditing]);
 
   // Mouse up for selection & fill
   useEffect(() => {
@@ -184,7 +215,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         setSelEnd({ row: fillRange.r2, col: sel.c2 });
         setFillTo(null);
         setIsDraggingFill(false);
-        setFillFrom(null);
       }
       setIsSelecting(false);
     };
@@ -195,6 +225,11 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   const handleCellMouseDown = (r: number, c: number, e: React.MouseEvent) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    // If clicking the already-selected single cell, start editing
+    if (sel && sel.r1 === r && sel.r2 === r && sel.c1 === c && sel.c2 === c && !editingCell) {
+      startEditing(r, c);
+      return;
+    }
     setEditingCell(null);
     setSelStart({ row: r, col: c });
     setSelEnd(null);
@@ -204,16 +239,12 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   };
 
   const handleCellMouseEnter = (r: number, c: number) => {
-    if (isSelecting) {
-      setSelEnd({ row: r, col: c });
-    }
-    if (isDraggingFill && r > (sel?.r2 ?? 0)) {
-      setFillTo(r);
-    }
+    if (isSelecting) setSelEnd({ row: r, col: c });
+    if (isDraggingFill && r > (sel?.r2 ?? 0)) setFillTo(r);
   };
 
   const handleCellDoubleClick = (r: number, c: number) => {
-    setEditingCell({ row: r, col: c });
+    startEditing(r, c);
   };
 
   const handleFillHandleDown = (e: React.MouseEvent) => {
@@ -221,7 +252,6 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     e.stopPropagation();
     if (!sel) return;
     setIsDraggingFill(true);
-    setFillFrom({ row: sel.r2, col: sel.c2 });
     setFillTo(null);
   };
 
@@ -232,28 +262,55 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
     onChange(updated);
   };
 
+  const handleEditingKeyDown = (r: number, c: number, e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setEditingCell(null);
+      // Move down
+      if (r < data.length - 1) {
+        setSelStart({ row: r + 1, col: c });
+        setSelEnd(null);
+      }
+    }
+    if (e.key === "Tab") {
+      e.preventDefault();
+      setEditingCell(null);
+      if (e.shiftKey) {
+        if (c > 0) { setSelStart({ row: r, col: c - 1 }); setSelEnd(null); }
+        else if (r > 0) { setSelStart({ row: r - 1, col: 1 }); setSelEnd(null); }
+      } else {
+        if (c < 1) { setSelStart({ row: r, col: c + 1 }); setSelEnd(null); }
+        else if (r < data.length - 1) { setSelStart({ row: r + 1, col: 0 }); setSelEnd(null); }
+      }
+    }
+    if (e.key === "Escape") {
+      setEditingCell(null);
+    }
+  };
+
   const handlePaste = (r: number, c: number, e: React.ClipboardEvent) => {
     const paste = e.clipboardData.getData("text");
     const lines = paste.split(/\r?\n/).filter(Boolean);
-    if (lines.length > 1) {
+    if (lines.length > 1 || (lines.length === 1 && lines[0].includes("\t"))) {
       e.preventDefault();
       pushHistory([...data]);
       const updated = [...data];
       for (let li = 0; li < lines.length; li++) {
         const idx = r + li;
         const cols = lines[li].split(/\t|;/);
-        if (idx >= updated.length) {
-          updated.push({ artikelnummer: "", cats: "" });
-        }
+        if (idx >= updated.length) updated.push({ artikelnummer: "", cats: "" });
         for (let ci = 0; ci < cols.length; ci++) {
           const col = c + ci;
-          if (col <= 1) updated[idx] = setCell(updated[idx], col, cols[ci]);
+          if (col <= 1) updated[idx] = setCell(updated[idx], col, cols[ci].trim());
         }
       }
       onChange(updated);
       if (updated.length > rowCount) onRowCountChange(updated.length);
+      setEditingCell(null);
     }
   };
+
+  const mod = isMac ? "⌘" : "Ctrl";
 
   return (
     <div className="space-y-3">
@@ -261,22 +318,16 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={undo}
-            disabled={history.length === 0}
-            title="Undo (Ctrl+Z)"
+            variant="ghost" size="icon" className="h-7 w-7"
+            onClick={undo} disabled={history.length === 0}
+            title={`Undo (${mod}+Z)`}
           >
             <Undo2 className="w-4 h-4" />
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={redo}
-            disabled={future.length === 0}
-            title="Redo (Ctrl+Y)"
+            variant="ghost" size="icon" className="h-7 w-7"
+            onClick={redo} disabled={future.length === 0}
+            title={`Redo (${mod}+Y)`}
           >
             <Redo2 className="w-4 h-4" />
           </Button>
@@ -284,10 +335,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         <div className="flex items-center gap-2">
           <Label htmlFor="rowCount" className="text-xs text-muted-foreground">Rows:</Label>
           <Input
-            id="rowCount"
-            type="number"
-            min={1}
-            max={500}
+            id="rowCount" type="number" min={1} max={500}
             value={rowCount}
             onChange={(e) => {
               const val = Math.max(1, Math.min(500, parseInt(e.target.value) || 1));
@@ -310,11 +358,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         ref={tableRef}
         tabIndex={0}
         className="border border-border rounded-lg overflow-auto max-h-[500px] select-none outline-none"
-        onMouseLeave={() => {
-          if (isSelecting) setIsSelecting(false);
-        }}
+        onMouseLeave={() => { if (isSelecting) setIsSelecting(false); }}
         onPaste={(e) => {
-          if (editingCell) return; // let the input handle it
+          if (editingCell) return;
           if (!sel) return;
           e.preventDefault();
           const paste = e.clipboardData.getData("text");
@@ -325,9 +371,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           for (let li = 0; li < lines.length; li++) {
             const cols = lines[li].split(/\t|;/);
             const r = sel.r1 + li;
-            if (r >= updated.length) {
-              updated.push({ artikelnummer: "", cats: "" });
-            }
+            if (r >= updated.length) updated.push({ artikelnummer: "", cats: "" });
             for (let ci = 0; ci < cols.length; ci++) {
               const c = sel.c1 + ci;
               if (c <= 1) updated[r] = setCell(updated[r], c, cols[ci].trim());
@@ -356,6 +400,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                   const isFilling = fillRange ? inRange(r, c, fillRange) : false;
                   const isEditing = editingCell?.row === r && editingCell?.col === c;
                   const isBottomRight = sel && r === sel.r2 && c === sel.c2;
+                  const isFocused = sel && sel.r1 === r && sel.r2 === r && sel.c1 === c && sel.c2 === c;
 
                   return (
                     <td
@@ -363,9 +408,10 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       className={cn(
                         "relative px-0 py-0 border-b border-border",
                         c === 0 && "border-r",
-                        isSelected && "bg-primary/10",
+                        isSelected && !isFocused && "bg-primary/10",
+                        isFocused && !isEditing && "ring-2 ring-inset ring-primary bg-primary/5",
                         isFilling && "bg-primary/5",
-                        !isSelected && !isFilling && "hover:bg-accent/30"
+                        !isSelected && !isFilling && !isFocused && "hover:bg-accent/30"
                       )}
                       onMouseDown={(e) => handleCellMouseDown(r, c, e)}
                       onMouseEnter={() => handleCellMouseEnter(r, c)}
@@ -379,13 +425,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                             value={cellValue(row, c)}
                             onChange={(e) => handleCellChange(r, c, e.target.value)}
                             onBlur={() => setEditingCell(null)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === "Tab") {
-                                e.preventDefault();
-                                setEditingCell(null);
-                              }
-                              if (e.key === "Escape") setEditingCell(null);
-                            }}
+                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
                             onPaste={(e) => handlePaste(r, c, e)}
                           />
                         ) : (
@@ -418,15 +458,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         </table>
       </div>
 
-      {/* Selection border overlay with CSS */}
-      {sel && (
-        <style>{`
-          /* Blue border around selection handled via cell bg above */
-        `}</style>
-      )}
-
       <p className="text-xs text-muted-foreground">
-        Drag the fill handle ■ to copy values down • {isMac ? "⌘" : "Ctrl"}+C / {isMac ? "⌘" : "Ctrl"}+V • {isMac ? "⌘" : "Ctrl"}+Z / {isMac ? "⌘" : "Ctrl"}+Y
+        Click to select • Click again or Enter to edit • Arrow keys / Tab to navigate • Fill handle ■ to copy down • {mod}+C / {mod}+V • {mod}+Z / {mod}+Y
       </p>
     </div>
   );
