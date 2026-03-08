@@ -284,6 +284,28 @@ export function FileUploader({ className }: FileUploaderProps) {
           rowCount={rowCount}
           onRowCountChange={setRowCount}
         />
+        <Button
+          onClick={() => {
+            const filledRows = tableData.filter(r => r.artikelnummer.trim() || r.cats.trim());
+            if (filledRows.length === 0) return;
+            const csvContent = "ID;Categories\n" + filledRows.map(r => `${r.artikelnummer};${r.cats}`).join("\n");
+            const result = processCategories(csvContent, prefix);
+            const blob = new Blob([result], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = generateOutputFilename(prefix);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+          }}
+          disabled={!tableData.some(r => r.artikelnummer.trim() || r.cats.trim()) || !prefix.trim()}
+          className="w-full h-11"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Download CSV
+        </Button>
       </div>
 
       {/* Error Message */}
