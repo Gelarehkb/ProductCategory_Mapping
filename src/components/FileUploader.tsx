@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from "react";
-import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle, Eye } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Upload, FileSpreadsheet, X, Download, Loader2, AlertCircle, CheckCircle, Eye, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,10 @@ export function FileUploader({ className }: FileUploaderProps) {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [previewData, setPreviewData] = useState<{ headers: string[]; rows: string[][] } | null>(null);
+  const [rowCount, setRowCount] = useState(10);
+  const [tableData, setTableData] = useState<{ artikelnummer: string; cats: string }[]>(
+    () => Array.from({ length: 10 }, () => ({ artikelnummer: "", cats: "" }))
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const acceptedTypes = [
@@ -266,6 +270,125 @@ export function FileUploader({ className }: FileUploaderProps) {
           </div>
         </div>
       )}
+
+      {/* Manual Table Input */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Grid3X3 className="w-4 h-4" />
+            <span>Manual Input</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="rowCount" className="text-xs text-muted-foreground">Rows:</Label>
+            <Input
+              id="rowCount"
+              type="number"
+              min={1}
+              max={500}
+              value={rowCount}
+              onChange={(e) => {
+                const val = Math.max(1, Math.min(500, parseInt(e.target.value) || 1));
+                setRowCount(val);
+                setTableData((prev) => {
+                  if (val > prev.length) {
+                    return [...prev, ...Array.from({ length: val - prev.length }, () => ({ artikelnummer: "", cats: "" }))];
+                  }
+                  return prev.slice(0, val);
+                });
+              }}
+              className="h-8 w-20 text-sm"
+            />
+          </div>
+        </div>
+        <div className="border border-border rounded-lg overflow-auto max-h-96">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12 text-center">#</TableHead>
+                <TableHead>Artikelnummer</TableHead>
+                <TableHead>Cats</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableData.map((row, i) => (
+                <TableRow key={i}>
+                  <TableCell className="text-center text-xs text-muted-foreground py-1">{i + 1}</TableCell>
+                  <TableCell className="py-1 px-1">
+                    <Input
+                      value={row.artikelnummer}
+                      onChange={(e) => {
+                        const updated = [...tableData];
+                        updated[i] = { ...updated[i], artikelnummer: e.target.value };
+                        setTableData(updated);
+                      }}
+                      onPaste={(e) => {
+                        const paste = e.clipboardData.getData("text");
+                        const lines = paste.split(/\r?\n/).filter(Boolean);
+                        if (lines.length > 1) {
+                          e.preventDefault();
+                          const updated = [...tableData];
+                          for (let li = 0; li < lines.length; li++) {
+                            const idx = i + li;
+                            const cols = lines[li].split(/\t|;/);
+                            if (idx < updated.length) {
+                              updated[idx] = {
+                                artikelnummer: cols[0] ?? updated[idx].artikelnummer,
+                                cats: cols[1] ?? updated[idx].cats,
+                              };
+                            } else {
+                              updated.push({
+                                artikelnummer: cols[0] ?? "",
+                                cats: cols[1] ?? "",
+                              });
+                            }
+                          }
+                          setTableData(updated);
+                          setRowCount(updated.length);
+                        }
+                      }}
+                      className="h-8 text-sm border-0 shadow-none focus-visible:ring-1"
+                      placeholder="—"
+                    />
+                  </TableCell>
+                  <TableCell className="py-1 px-1">
+                    <Input
+                      value={row.cats}
+                      onChange={(e) => {
+                        const updated = [...tableData];
+                        updated[i] = { ...updated[i], cats: e.target.value };
+                        setTableData(updated);
+                      }}
+                      onPaste={(e) => {
+                        const paste = e.clipboardData.getData("text");
+                        const lines = paste.split(/\r?\n/).filter(Boolean);
+                        if (lines.length > 1) {
+                          e.preventDefault();
+                          const updated = [...tableData];
+                          for (let li = 0; li < lines.length; li++) {
+                            const idx = i + li;
+                            if (idx < updated.length) {
+                              updated[idx] = { ...updated[idx], cats: lines[li] };
+                            } else {
+                              updated.push({ artikelnummer: "", cats: lines[li] });
+                            }
+                          }
+                          setTableData(updated);
+                          setRowCount(updated.length);
+                        }
+                      }}
+                      className="h-8 text-sm border-0 shadow-none focus-visible:ring-1"
+                      placeholder="—"
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Paste columns from Excel — the table expands automatically.
+        </p>
+      </div>
 
       {/* Error Message */}
       {errorMessage && (
