@@ -286,9 +286,14 @@ export function FileUploader({ className }: FileUploaderProps) {
         />
         <Button
           onClick={() => {
-            const filledRows = tableData.filter(r => r.artikelnummer.trim() || r.cats.trim());
+            const filledRows = tableData.filter(r => r.artikelnummer.trim() || r.cats.trim() || r.catsManual.trim());
             if (filledRows.length === 0) return;
-            const csvContent = "ID;Categories\n" + filledRows.map(r => `${r.artikelnummer};${r.cats}`).join("\n");
+            // Merge cats and catsManual per row
+            const mergedRows = filledRows.map(r => {
+              const merged = mergeCategories(r.cats, r.catsManual);
+              return { artikelnummer: r.artikelnummer, cats: merged };
+            });
+            const csvContent = "ID;Categories\n" + mergedRows.map(r => `${r.artikelnummer};${r.cats}`).join("\n");
             const result = processCategories(csvContent, prefix);
             const blob = new Blob([result], { type: "text/csv;charset=utf-8" });
             const url = URL.createObjectURL(blob);
