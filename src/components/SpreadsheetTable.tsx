@@ -339,7 +339,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Label htmlFor="rowCount" className="text-xs text-muted-foreground">Rows:</Label>
+          <Label htmlFor="rowCount" className="text-xs text-muted-foreground">{t("table.rows")}</Label>
           <Input
             id="rowCount" type="number" min={1} max={500}
             value={rowCount}
