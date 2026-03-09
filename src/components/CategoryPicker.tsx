@@ -87,6 +87,10 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
       {/* Trigger */}
       <div
         ref={triggerRef}
+        onMouseDown={(e) => {
+          // Prevent SpreadsheetTable cell handlers from hijacking clicks (which can cancel selection)
+          e.stopPropagation();
+        }}
         onClick={() => setOpen(!open)}
         className={cn(
           "min-h-[2rem] w-full px-2 py-1 text-sm border border-input rounded-md cursor-pointer",
