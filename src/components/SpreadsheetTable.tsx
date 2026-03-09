@@ -436,24 +436,12 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                       onDoubleClick={() => handleCellDoubleClick(r, c)}
                     >
                       {c === 2 ? (
-                        isEditing ? (
-                          <input
-                            autoFocus
-                            className="w-full h-8 px-2 text-sm bg-background border-2 border-primary rounded-none outline-none"
-                            value={cellValue(row, c)}
-                            onChange={(e) => handleCellChange(r, c, e.target.value)}
-                            onBlur={() => setEditingCell(null)}
-                            onKeyDown={(e) => handleEditingKeyDown(r, c, e)}
-                            onPaste={(e) => handlePaste(r, c, e)}
-                          />
-                        ) : (
                           <div className="min-h-[2rem]">
                             <CategoryPicker
                               value={cellValue(row, c)}
                               onChange={(val) => handleCellChange(r, c, val)}
                             />
                           </div>
-                        )
                       ) : (
                         isEditing ? (
                           <input
