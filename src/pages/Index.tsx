@@ -27,7 +27,7 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-7xl py-8 px-4">
+      <main className="py-2 px-2">
         <div className="space-y-8">
           {/* Instructions */}
           <div className="text-center space-y-2">
