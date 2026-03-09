@@ -106,7 +106,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute z-[100] mt-1 w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden">
+        <div onClick={(e) => e.stopPropagation()} className="absolute z-[100] mt-1 w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden">
           {/* Search */}
           <div className="p-2 border-b border-border">
             <div className="relative">
