@@ -401,9 +401,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
         <table className="w-full text-sm border-collapse table-fixed">
           <colgroup>
             <col className="w-10" />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "250px" }} />
-            <col />
+            <col style={{ width: "33%" }} />
+            <col style={{ width: "33%" }} />
+            <col style={{ width: "33%" }} />
           </colgroup>
           <thead className="sticky top-0 z-10 bg-muted">
             <tr>
