@@ -398,7 +398,13 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
           if (updated.length > rowCount) onRowCountChange(updated.length);
         }}
       >
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-sm border-collapse table-fixed">
+          <colgroup>
+            <col className="w-10" />
+            <col style={{ width: "200px" }} />
+            <col style={{ width: "250px" }} />
+            <col />
+          </colgroup>
           <thead className="sticky top-0 z-10 bg-muted">
             <tr>
               <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted-foreground border-b border-r border-border">#</th>
