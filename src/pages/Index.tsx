@@ -58,7 +58,7 @@ const Index = () => {
           </div>
 
           {/* File Uploader */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+          <div className="bg-card border border-border/50 rounded-xl p-4 shadow-sm">
             <FileUploader />
           </div>
 
