@@ -430,7 +430,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                     <td
                       key={c}
                       className={cn(
-                        "relative px-0 py-0 border-b border-border",
+                        "relative px-0 py-0 border-b border-border overflow-hidden",
                         (c === 0 || c === 1) && "border-r",
                         isSelected && !isFocused && "bg-primary/10",
                         isFocused && !isEditing && "ring-2 ring-inset ring-primary bg-primary/5",
@@ -460,8 +460,8 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
                             onPaste={(e) => handlePaste(r, c, e)}
                           />
                         ) : (
-                          <div className="w-full h-8 px-2 flex items-center text-sm truncate cursor-cell">
-                            {cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}
+                          <div className="w-full h-8 px-2 flex items-center text-sm cursor-cell overflow-hidden">
+                            <span className="truncate">{cellValue(row, c) || <span className="text-muted-foreground/40">—</span>}</span>
                           </div>
                         )
                       )}
