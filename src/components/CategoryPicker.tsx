@@ -116,6 +116,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
                 <span className="truncate">{short}</span>
                 <X
                   className="w-3 h-3 shrink-0 cursor-pointer hover:text-destructive"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
                     removePath(p);
