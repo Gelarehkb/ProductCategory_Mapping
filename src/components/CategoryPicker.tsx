@@ -87,6 +87,10 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
       {/* Trigger */}
       <div
         ref={triggerRef}
+        onMouseDown={(e) => {
+          // Prevent SpreadsheetTable cell handlers from hijacking clicks (which can cancel selection)
+          e.stopPropagation();
+        }}
         onClick={() => setOpen(!open)}
         className={cn(
           "min-h-[2rem] w-full px-2 py-1 text-sm border border-input rounded-md cursor-pointer",
@@ -112,6 +116,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
                 <span className="truncate">{short}</span>
                 <X
                   className="w-3 h-3 shrink-0 cursor-pointer hover:text-destructive"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
                     removePath(p);
