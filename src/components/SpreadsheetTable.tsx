@@ -363,7 +363,7 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
       <div
         ref={tableRef}
         tabIndex={0}
-        className="border border-border rounded-lg overflow-auto flex-1 min-h-0 select-none outline-none"
+        className="border border-border/40 rounded-md overflow-auto flex-1 min-h-0 select-none outline-none"
         onMouseLeave={() => { if (isSelecting) setIsSelecting(false); }}
         onCopy={(e) => {
           if (editingCell || !sel) return;

@@ -27,7 +27,7 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-4xl py-12 px-4">
+      <main className="container max-w-7xl py-8 px-4">
         <div className="space-y-8">
           {/* Instructions */}
           <div className="text-center space-y-2">
@@ -58,7 +58,7 @@ const Index = () => {
           </div>
 
           {/* File Uploader */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+          <div className="bg-card border border-border/50 rounded-xl p-4 shadow-sm">
             <FileUploader />
           </div>
 
