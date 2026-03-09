@@ -83,9 +83,10 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
     : null;
 
   return (
-    <div ref={ref} className="relative w-full">
+    <div className="relative w-full">
       {/* Trigger */}
       <div
+        ref={triggerRef}
         onClick={() => setOpen(!open)}
         className={cn(
           "min-h-[2rem] w-full px-2 py-1 text-sm border border-input rounded-md cursor-pointer",
@@ -122,9 +123,14 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
         )}
       </div>
 
-      {/* Dropdown */}
-      {open && (
-        <div onClick={(e) => e.stopPropagation()} className="absolute z-[100] mt-1 w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden">
+      {/* Dropdown via portal */}
+      {open && dropdownPos && createPortal(
+        <div
+          ref={dropdownRef}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed z-[9999] w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden"
+          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+        >
           {/* Search */}
           <div className="p-2 border-b border-border">
             <div className="relative">
@@ -194,7 +200,8 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
               </Button>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
