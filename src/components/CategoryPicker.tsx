@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { ChevronRight, ChevronDown, Check, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +15,32 @@ interface CategoryPickerProps {
 export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
 
   const selectedPaths = value
     ? value.split("\n").filter(Boolean)
     : [];
 
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) updatePosition();
+  }, [open, updatePosition]);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        triggerRef.current && !triggerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     };
@@ -65,9 +83,10 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
     : null;
 
   return (
-    <div ref={ref} className="relative w-full">
+    <div className="relative w-full">
       {/* Trigger */}
       <div
+        ref={triggerRef}
         onClick={() => setOpen(!open)}
         className={cn(
           "min-h-[2rem] w-full px-2 py-1 text-sm border border-input rounded-md cursor-pointer",
@@ -104,9 +123,14 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
         )}
       </div>
 
-      {/* Dropdown */}
-      {open && (
-        <div onClick={(e) => e.stopPropagation()} className="absolute z-[100] mt-1 w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden">
+      {/* Dropdown via portal */}
+      {open && dropdownPos && createPortal(
+        <div
+          ref={dropdownRef}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed z-[9999] w-[420px] max-h-[480px] bg-popover border border-border rounded-lg shadow-xl flex flex-col overflow-hidden"
+          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+        >
           {/* Search */}
           <div className="p-2 border-b border-border">
             <div className="relative">
@@ -176,7 +200,8 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
               </Button>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
