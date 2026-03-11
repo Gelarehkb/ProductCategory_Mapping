@@ -122,6 +122,9 @@ export function SpreadsheetTable({ data, onChange, rowCount, onRowCountChange }:
   // Keyboard shortcuts (no clipboard here — handled via onCopy/onPaste on the div)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Don't intercept keys when user is typing in a portal (e.g. CategoryPicker search)
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-portal-input]')) return;
       const mod = e.ctrlKey || e.metaKey;
 
       // Undo/Redo
