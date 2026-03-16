@@ -327,12 +327,24 @@ export function FileUploader({ className }: FileUploaderProps) {
           onClick={() => {
             const filledRows = tableData.filter(r => r.artikelnummer.trim() || r.cats.trim() || r.catsManual.trim());
             if (filledRows.length === 0) return;
-            // Merge cats and catsManual per row
-            const mergedRows = filledRows.map(r => {
+            // Merge cats and catsManual per row, then expand hierarchy
+            const expandedRows: { id: string; cats: string }[] = [];
+            for (const r of filledRows) {
               const merged = mergeCategories(r.cats, r.catsManual);
-              return { artikelnummer: r.artikelnummer, cats: merged };
-            });
-            const csvContent = "ID;Categories\n" + mergedRows.map(r => `${r.artikelnummer};${r.cats}`).join("\n");
+              const paths = merged.split(/[\n\r]+/).map(s => s.trim()).filter(s => s.length > 0);
+              for (const path of paths) {
+                // Normalize arrow separators
+                const parts = path.split(/\s*->\s*/).filter(p => p.length > 0);
+                // Create rows from deepest to root: A->B->C, A->B, A
+                for (let i = parts.length; i >= 1; i--) {
+                  expandedRows.push({
+                    id: r.artikelnummer,
+                    cats: parts.slice(0, i).join("->"),
+                  });
+                }
+              }
+            }
+            const csvContent = "ID;Categories\n" + expandedRows.map(r => `${r.id};${r.cats}`).join("\n");
             const result = processCategories(csvContent, prefix);
             const blob = new Blob([result], { type: "text/csv;charset=utf-8" });
             const url = URL.createObjectURL(blob);
